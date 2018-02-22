@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     X_test = mnist[len(mnist)//2:, 1:]
     y_test = mnist[len(mnist)//2:, 0].astype(np.int)
-
+    
     print('Training Sklearn OVR...')
     y_pred_train, y_pred_test = sklearn_multiclass_prediction(
         'ovr', X_train, y_train, X_test)
@@ -37,7 +37,7 @@ if __name__ == '__main__':
           metrics.accuracy_score(y_train, y_pred_train))
     print('Sklearn Crammer-Singer Accuracy (test) :',
           metrics.accuracy_score(y_test, y_pred_test))
-
+    
     print('Training self OVR...')
     self_ovr = MulticlassSVM('ovr')
     self_ovr.fit(X_train, y_train)

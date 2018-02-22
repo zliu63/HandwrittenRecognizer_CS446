@@ -72,7 +72,13 @@ class MulticlassSVM:
             binary_svm: a dictionary with labels as keys,
                         and binary SVM models as values.
         '''
-        pass
+        binary_svm = {}
+        for i in range(10):
+            Y = (y == i).astype(int)
+            classifier = svm.LinearSVC()
+            classifier.fit(X,Y)
+            binary_svm[i] = classifier
+        return binary_svm
 
     def bsvm_ovo_student(self, X, y):
         '''
@@ -85,7 +91,20 @@ class MulticlassSVM:
             binary_svm: a dictionary with label pairs as keys,
                         and binary SVM models as values.
         '''
-        pass
+        binary_svm = {}
+        for i in range(9):
+            for j in range(i+1,10):
+                X_train_i = X[np.where(y==i)[0]]
+                Y_train_i = y[np.where(y==i)[0]]
+                X_train_j = X[np.where(y==j)[0]]
+                Y_train_j = y[np.where(y==j)[0]]
+                X_train = np.concatenate((X_train_i,X_train_j),axis=0)
+                Y_train = np.concatenate((Y_train_i,Y_train_j),axis=0)
+                Y_train = (Y_train == i).astype(int)
+                classifier = svm.LinearSVC(random_state = 0)
+                classifier.fit(X_train,Y_train)
+                binary_svm[(i,j)] = classifier
+        return binary_svm
 
     def scores_ovr_student(self, X):
         '''
@@ -97,7 +116,12 @@ class MulticlassSVM:
         Returns:
             scores: a numpy ndarray with scores.
         '''
-        pass
+        N = X.shape[0]
+        k = 10
+        scores = np.zeros((N,k))
+        for i in range(10):
+            scores[:,i] = self.binary_svm[i].decision_function(X)
+        return scores
 
     def scores_ovo_student(self, X):
         '''
@@ -109,7 +133,17 @@ class MulticlassSVM:
         Returns:
             scores: a numpy ndarray with scores.
         '''
-        pass
+        N = X.shape[0]
+        k = 10
+        scores = np.zeros((N,k))
+        for pair in self.binary_svm:
+            i = pair[0]
+            j = pair[1]
+            clf = self.binary_svm[pair]
+            pred = clf.predict(X)
+            scores[:,i] += pred
+            scores[:,j] += (pred==0).astype(int)
+        return scores
 
     def loss_student(self, W, X, y, C=1.0):
         '''
@@ -126,7 +160,19 @@ class MulticlassSVM:
         Returns:
             The value of loss function given W, X and y.
         '''
-        pass
+        K,d = W.shape
+        N = X.shape[0]
+        part1 = np.sum(np.square(np.linalg.norm(W,axis = 1)))*0.5
+        middle = np.zeros(N)
+        for i in range(N):
+            tmp = np.zeros(K)
+            for j in range(K):
+                delta = 1 if j == y[i] else 0
+                tmp[j] = 1 - delta + np.matmul(W[j],X[i])
+            middle[i] = np.max(tmp) - np.matmul(W[y[i]], X[i])
+        part2 = C*np.sum(middle)
+        return part1+part2
+
 
     def grad_student(self, W, X, y, C=1.0):
         '''
@@ -144,4 +190,28 @@ class MulticlassSVM:
             The graident of loss function w.r.t. W,
             in a numpy array of shape (K, d).
         '''
-        pass
+        K,d = W.shape
+        N = X.shape[0]
+        grad = np.zeros((K,d))
+        for i in range(N):
+            tmp = np.zeros(K)
+            for j in range(K):
+                delta = 1 if j == y[i] else 0
+                tmp[j] = 1 - delta + np.matmul(W[j],X[i])
+            argmax_j = np.argmax(tmp)
+            yi = y[i]
+            if yi != argmax_j:
+                grad[yi] -= C*X[i]
+                grad[argmax_j] += C*X[i]
+                
+
+
+        grad += W
+        return grad
+
+
+        
+
+
+
+

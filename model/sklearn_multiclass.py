@@ -16,4 +16,20 @@ def sklearn_multiclass_prediction(mode, X_train, y_train, X_test):
                                    being your prediction of labels on
                                    training and test data, from 0 to 9.
     '''
-    pass
+    if mode == 'ovr':
+        clf = multiclass.OneVsRestClassifier(svm.LinearSVC())
+        clf.fit(X_train, y_train) 
+        y_pred_train = clf.predict(X_train)
+        y_pred_test = clf.predict(X_test)
+    elif mode == 'ovo':
+        clf = multiclass.OneVsOneClassifier(svm.LinearSVC())
+        clf.fit(X_train, y_train)
+        y_pred_train = clf.predict(X_train)
+        y_pred_test = clf.predict(X_test)
+    else:
+        clf = svm.LinearSVC(multi_class = 'crammer_singer')
+        clf.fit(X_train, y_train) 
+        y_pred_train = clf.predict(X_train)
+        y_pred_test = clf.predict(X_test)
+    return y_pred_train,y_pred_test
+
