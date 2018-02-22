@@ -75,7 +75,7 @@ class MulticlassSVM:
         binary_svm = {}
         for i in range(10):
             Y = (y == i).astype(int)
-            classifier = svm.LinearSVC(random_state = 0)
+            classifier = svm.LinearSVC(random_state = 12345)
             classifier.fit(X,Y)
             binary_svm[i] = classifier
         return binary_svm
@@ -101,7 +101,7 @@ class MulticlassSVM:
                 X_train = np.concatenate((X_train_i,X_train_j),axis=0)
                 Y_train = np.concatenate((Y_train_i,Y_train_j),axis=0)
                 Y_train = (Y_train == i).astype(int)
-                classifier = svm.LinearSVC(random_state = 0)
+                classifier = svm.LinearSVC(random_state = 12345)
                 classifier.fit(X_train,Y_train)
                 binary_svm[(i,j)] = classifier
         return binary_svm
