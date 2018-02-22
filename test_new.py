@@ -40,6 +40,7 @@ class TestSklearn(unittest.TestCase):
         test_acc = metrics.accuracy_score(self.y_test, y_pred_test)
 
         self.assertTrue(abs(train_acc - 1.0) < 1e-6)
+        print('test_acc = '+str(test_acc))
         self.assertTrue(abs(test_acc - 0.814875) < 1e-6)
 
     def test_sklearn_ovo_accuracy(self):
@@ -72,6 +73,7 @@ class TestSklearn(unittest.TestCase):
             self.y_test, self_ovr.predict(self.X_test))
 
         self.assertTrue(abs(train_acc - 1.0) < 1e-6)
+        print('test_acc = '+str(test_acc))
         self.assertTrue(abs(test_acc - 0.814875) < 1e-6)
 
     def test_self_ovo_accuracy(self):
