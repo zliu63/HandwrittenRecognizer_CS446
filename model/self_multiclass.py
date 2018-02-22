@@ -75,7 +75,7 @@ class MulticlassSVM:
         binary_svm = {}
         for i in range(10):
             Y = (y == i).astype(int)
-            classifier = svm.LinearSVC()
+            classifier = svm.LinearSVC(random_state = 0)
             classifier.fit(X,Y)
             binary_svm[i] = classifier
         return binary_svm
